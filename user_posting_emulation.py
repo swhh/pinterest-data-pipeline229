@@ -1,3 +1,4 @@
+import datetime
 import requests
 from time import sleep
 import random
@@ -7,9 +8,16 @@ import json
 import sqlalchemy
 from sqlalchemy import text
 import yaml
+import requests
 
 DB_CREDS = 'db_creds.yaml'
-
+USER_ID = '0afff2eeb7e3'
+INVOKE_URL = 'https://46wmghohz3.execute-api.us-east-1.amazonaws.com/dev/topics/{topic_name}'
+TOPIC_NAMES = [f'{USER_ID}.{topic_end}' for topic_end in ['pin', 'geo', 'user']]
+HEADERS = {'Content-Type': 'application/vnd.kafka.json.v2+json'}
+PIN_EXAMPLE = {'index': 75285, 'unique_id': 'fbe53c66-3442-4773-b19e-d3ec6f54dddf', 'title': 'No tittle Data Available', 'description': 'No description available Story format', 'poster_name': 'User Info Error', 'follower_count': 'User Info Error', 'tag_list': 'N,o, ,T,a,g,s, ,A,v,a,i,l,a,b,l,e', 'is_image_or_video': 'multi-video(story page format)', 'image_src': 'Image src error.', 'downloaded': 0, 'save_location': 'Local save in /data/mens-fashion', 'category': 'mens-fashion'}
+GEO_EXAMPLE = {'ind': 7528, 'timestamp': datetime.datetime(2020, 8, 28, 3, 52, 47), 'latitude': -89.9787, 'longitude': -173.293, 'country': 'Albania'}
+USER_EXAMPLE = {'ind': 7528, 'first_name': 'Abigail', 'last_name': 'Ali', 'age': 20, 'date_joined': datetime.datetime(2015, 10, 24, 11, 23, 51)}
 random.seed(100)
 
 
@@ -67,11 +75,28 @@ def run_infinite_post_data_loop():
             print(pin_result)
             print(geo_result)
             print(user_result)
+            print(type(pin_result))
 
+
+def post_record_to_kafka(data, topic_name):
+    payload = json.dumps({
+    "records": [
+        {
+        #Data should be send as pairs of column_name:value, with different columns separated by commas       
+        "value": data
+        }
+    ]
+})
+    invoke_url = INVOKE_URL.format(topic_name=topic_name)
+    print(invoke_url)
+    response = requests.request("POST", invoke_url, headers=HEADERS, data=payload)
+    print(response.status_code)
+    
 
 if __name__ == "__main__":
-    run_infinite_post_data_loop()
-    print('Working')
+    #run_infinite_post_data_loop()
+    #print('Working')
+    post_record_to_kafka(data=PIN_EXAMPLE, topic_name=TOPIC_NAMES[0])
     
     
 

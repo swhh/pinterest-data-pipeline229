@@ -71,11 +71,14 @@ def run_infinite_post_data_loop():
             
             for row in user_selected_row:
                 user_result = dict(row._mapping)
+
+            post_record_to_kafka(pin_result, TOPIC_NAMES[0])
+            post_record_to_kafka(geo_result, TOPIC_NAMES[1])
+            post_record_to_kafka(user_result, TOPIC_NAMES[2])
             
             print(pin_result)
             print(geo_result)
             print(user_result)
-            print(type(pin_result))
 
 
 def post_record_to_kafka(data, topic_name):
@@ -86,7 +89,7 @@ def post_record_to_kafka(data, topic_name):
         "value": data
         }
     ]
-})
+}, default=str)
     invoke_url = INVOKE_URL.format(topic_name=topic_name)
     print(invoke_url)
     response = requests.request("POST", invoke_url, headers=HEADERS, data=payload)
@@ -94,9 +97,9 @@ def post_record_to_kafka(data, topic_name):
     
 
 if __name__ == "__main__":
-    #run_infinite_post_data_loop()
-    #print('Working')
-    post_record_to_kafka(data=PIN_EXAMPLE, topic_name=TOPIC_NAMES[0])
+    run_infinite_post_data_loop()
+    print('Working')
+    
     
     
 

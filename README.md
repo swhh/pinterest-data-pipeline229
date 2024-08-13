@@ -6,5 +6,5 @@ The purpose of this project is to create build a data pipeline with Python, Kafk
 
 ## File structure
 
-- user_posting_emulation Python file to fetch data from AWS RDS
+- user_posting_emulation Python file to fetch data from AWS RDS and stream the records to three Kafka topics via a REST proxy built with Confluent and the AWS API Gateway
 - requirements.txt detailing Python dependencies

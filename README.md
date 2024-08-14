@@ -10,3 +10,4 @@ The purpose of this project is to create build a data pipeline with Python, Kafk
 - requirements.txt detailing Python dependencies
 - 0afff2eeb7e3.ipynb Databricks notebook, which processes Pinterest records with Pyspark on a Databricks clusters, cleaning the records and generating analytics insights from them
 - 0afff2eeb7e3_dag Python file which runs the above notebook on a daily schedule via AWS MWAA
+- user_posting_emulation_streaming Python file to simulate a stream of data being sent to AWS Kinesis via an AWS Gateway API

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 #Define params for Submit Run Operator
 notebook_task = {
-    'notebook_path': '/Users/seamus.holland@icloud.com/0afff2eeb7e3',
+    'notebook_path': '/Users/seamus.holland@icloud.com/data_pipeline',
 }
 
 
@@ -16,19 +16,17 @@ notebook_params = {
 
 
 default_args = {
-    'owner': '0afff2eeb7e3',
+    'owner': 'swhh',
     'depends_on_past': False,
     'email_on_failure': False,
     'email_on_retry': False,
-    'retries': 1,
-    'retry_delay': timedelta(minutes=5)
+    'retries': 5,
+    'retry_delay': timedelta(minutes=2)
 }
 
 
-with DAG('0afff2eeb7e3_dag',
-    # should be a datetime format
-    start_date=datetime(2024, 8, 13),
-    # check out possible intervals, should be a string
+with DAG(dag_id='0afff2eeb7e3_dag',
+    start_date=datetime(2024, 8, 16),
     schedule_interval='@daily',
     catchup=False,
     default_args=default_args

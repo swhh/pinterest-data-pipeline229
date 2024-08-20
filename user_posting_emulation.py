@@ -1,23 +1,18 @@
-import datetime
-import requests
-from time import sleep
-import random
-from multiprocessing import Process
-import boto3
+
 import json
+import requests
+import random
+from time import sleep
 import sqlalchemy
 from sqlalchemy import text
 import yaml
-import requests
+
 
 DB_CREDS = 'db_creds.yaml'
 USER_ID = '0afff2eeb7e3'
 INVOKE_URL = 'https://46wmghohz3.execute-api.us-east-1.amazonaws.com/dev/topics/{topic_name}'
 TOPIC_NAMES = [f'{USER_ID}.{topic_end}' for topic_end in ['pin', 'geo', 'user']]
 HEADERS = {'Content-Type': 'application/vnd.kafka.json.v2+json'}
-PIN_EXAMPLE = {'index': 75285, 'unique_id': 'fbe53c66-3442-4773-b19e-d3ec6f54dddf', 'title': 'No tittle Data Available', 'description': 'No description available Story format', 'poster_name': 'User Info Error', 'follower_count': 'User Info Error', 'tag_list': 'N,o, ,T,a,g,s, ,A,v,a,i,l,a,b,l,e', 'is_image_or_video': 'multi-video(story page format)', 'image_src': 'Image src error.', 'downloaded': 0, 'save_location': 'Local save in /data/mens-fashion', 'category': 'mens-fashion'}
-GEO_EXAMPLE = {'ind': 7528, 'timestamp': datetime.datetime(2020, 8, 28, 3, 52, 47), 'latitude': -89.9787, 'longitude': -173.293, 'country': 'Albania'}
-USER_EXAMPLE = {'ind': 7528, 'first_name': 'Abigail', 'last_name': 'Ali', 'age': 20, 'date_joined': datetime.datetime(2015, 10, 24, 11, 23, 51)}
 random.seed(100)
 
 
@@ -71,14 +66,9 @@ def run_infinite_post_data_loop():
             
             for row in user_selected_row:
                 user_result = dict(row._mapping)
-
-            post_record_to_kafka(pin_result, TOPIC_NAMES[0])
-            post_record_to_kafka(geo_result, TOPIC_NAMES[1])
-            post_record_to_kafka(user_result, TOPIC_NAMES[2])
             
-            print(pin_result)
-            print(geo_result)
-            print(user_result)
+            yield pin_result, geo_result, user_result
+
 
 
 def post_record_to_kafka(data, topic_name):
@@ -91,14 +81,18 @@ def post_record_to_kafka(data, topic_name):
     ]
 }, default=str)
     invoke_url = INVOKE_URL.format(topic_name=topic_name)
-    print(invoke_url)
-    response = requests.request("POST", invoke_url, headers=HEADERS, data=payload)
-    print(response.status_code)
+    requests.request("POST", invoke_url, headers=HEADERS, data=payload)
     
 
+def post_records_to_kafka():
+    gen = run_infinite_post_data_loop()
+    for pin_result, geo_result, user_result in gen:
+        post_record_to_kafka(pin_result, TOPIC_NAMES[0])
+        post_record_to_kafka(geo_result, TOPIC_NAMES[1])
+        post_record_to_kafka(user_result, TOPIC_NAMES[2])
+
 if __name__ == "__main__":
-    run_infinite_post_data_loop()
-    print('Working')
+    post_records_to_kafka()
     
     
     

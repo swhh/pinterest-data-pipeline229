@@ -11,6 +11,7 @@ PARTITION_KEY = 'partition-1'
 
 
 def post_records_to_kinesis():
+    """Streams Pinterest data to AWS Kinesis"""
     gen = run_infinite_post_data_loop()
     for pin_result, geo_result, user_result in gen:
         post_record_to_kinesis(pin_result, STREAM_NAMES[0])
@@ -19,6 +20,7 @@ def post_records_to_kinesis():
             
 
 def post_record_to_kinesis(data, stream_name):
+    """Posts Pinterest record data to Kinesis stream stream_name"""
     payload = json.dumps({
     "StreamName": stream_name,
     "Data": data,

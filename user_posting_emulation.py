@@ -1,7 +1,7 @@
 
 import json
-import requests
 import random
+import requests
 from time import sleep
 import sqlalchemy
 from sqlalchemy import text
@@ -24,7 +24,7 @@ def read_db_creds(yaml_file: str):
 
 
 class AWSDBConnector:
-
+    """AWS RDS database connection class"""
     def __init__(self):
         creds_dict = read_db_creds(DB_CREDS)
         self.HOST = creds_dict['HOST']
@@ -42,6 +42,7 @@ new_connector = AWSDBConnector()
 
 
 def run_infinite_post_data_loop():
+    """Fetches Pinterest data records from AWS RDS data and simulates stream via Python generator"""
     while True:
         sleep(random.randrange(0, 2))
         random_row = random.randint(0, 11000)
@@ -72,6 +73,7 @@ def run_infinite_post_data_loop():
 
 
 def post_record_to_kafka(data, topic_name):
+    """Posts Pinterest record represented as data to Kafka topic topic_name"""
     payload = json.dumps({
     "records": [
         {
@@ -85,6 +87,7 @@ def post_record_to_kafka(data, topic_name):
     
 
 def post_records_to_kafka():
+    """Streams Pinterest data to Kafka"""
     gen = run_infinite_post_data_loop()
     for pin_result, geo_result, user_result in gen:
         post_record_to_kafka(pin_result, TOPIC_NAMES[0])
